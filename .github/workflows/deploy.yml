@@ -52,6 +52,7 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
         run: |
           docker build --platform linux/amd64 \
+            --provenance=false \
             -t $ECR_REGISTRY/myapp-client:$IMAGE_TAG \
             ./client
 
@@ -63,6 +64,7 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
         run: |
           docker build --platform linux/amd64 \
+            --provenance=false \
             -t $ECR_REGISTRY/myapp-server:$IMAGE_TAG \
             ./server
 
