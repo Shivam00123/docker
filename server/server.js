@@ -13,5 +13,5 @@ const PORT = 8000;
 app.use("/api/v1/jsonData", jsonDataRouter);
 
 app.listen(PORT, () => {
-  console.log(`Server started at PORT: ${PORT}`);
+  console.log(`Server started at PORT : ${PORT}`);
 });
