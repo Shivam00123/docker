@@ -5,29 +5,46 @@ on:
     branches:
       - production
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          node-version: "20"
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
 
-      - name: Install backend dependencies
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push client image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
         run: |
-          cd server
-          npm ci
+          docker build --platform linux/amd64 \
+            -t $ECR_REGISTRY/myapp-client:$IMAGE_TAG \
+            ./client
 
-      - name: Build frontend
+          docker push $ECR_REGISTRY/myapp-client:$IMAGE_TAG
+
+      - name: Build and push server image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
         run: |
-          cd client
-          npm ci
-          npm run build
+          docker build --platform linux/amd64 \
+            -t $ECR_REGISTRY/myapp-server:$IMAGE_TAG \
+            ./server
 
-      - name: Verify pipeline
-        run: echo "Production CI pipeline completed successfully!"
+          docker push $ECR_REGISTRY/myapp-server:$IMAGE_TAG
