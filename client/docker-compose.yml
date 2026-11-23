@@ -1,0 +1,12 @@
+services:
+  client:
+    build: ./
+    ports:
+      - 3000:5173
+    networks:
+      - app-network
+    container_name: client-container
+
+networks:
+  app-network:
+    external: true
