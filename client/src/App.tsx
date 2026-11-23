@@ -14,7 +14,7 @@ function App() {
   const [data, setData] = useState<DataProps | null>(null);
 
   const fetchJsonData = async () => {
-    const response = await fetch("http://localhost:8000/api/v1/jsonData").then(
+    const response = await fetch("http://13.221.55.210:8000/api/v1/jsonData").then(
       (data) => data.json(),
     );
     setData(response?.data || null);
